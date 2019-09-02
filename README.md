@@ -15,7 +15,11 @@ https://www.fairvote.ca/stvbc/
 Usage
 ------
 
-Both of the implemented heuristics rely on an STV simulator that implements the specific model of STV applied in the elections being studied. Our implementation uses the STV simulator written by Andrew Conway, which models the variant of STV used in Australian Federal Senate elections. This simulator can be downloaded from https://github.com/SiliconEconometrics/PublicService. Follow the instructions provided to compile and run the simulator.
+Both of the implemented heuristics rely on an STV simulator that implements the specific model of STV applied in the elections being studied. Our implementation uses the STV simulator written by Andrew Conway, which models the variant of STV used in Australian Federal Senate elections. This simulator can be downloaded from:
+
+https://github.com/SiliconEconometrics/PublicService. 
+
+Follow the instructions provided to compile and run the simulator.
 
 To use our heuristics, download the STV-Manipulator repository and place the PublicService folder (downloaded via Andrew's repository, above) in the STV-Manipulator directory. Compile with the provided Makefile (you may need to modify this with alternate directories for dependences such as CPLEX, and if you are not using Linux).
 
