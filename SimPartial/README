@@ -1,1 +1,12 @@
-Code for partially simulating an STV election and recorded the election state as a data file.
+SimPartial is designed to simulate an STV election until a given number K
+of candidate remain standing. To run the simulator, compile with the
+given Makefile and run with the command:
+
+(For example)
+
+./stv -ballots "../2019/federal_2019_ACT.txt" -simuntil 10 federal_2019_ACT_simUntil10.txt 
+
+The above command simulates for 10 rounds and then stops, recording a |C|-10 candidate election in federal_2019_ACT_simUntil10.txt.
+
+Note that the -quota_override flag (not used above) is only used when simulating a partial election. If we don't use the flag, a quota based on the election tail will be computed. 
+  
