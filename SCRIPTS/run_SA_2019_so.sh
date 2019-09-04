@@ -72,7 +72,7 @@ echo "Apply 1% of candidate manipulations"
 rm SO_SA_2019_manipulation_simUntil35.txt_*.log
 
 echo "Apply 0.5% of candidate manipulations"
-./stv -ballots "2019/federal_2019_SA.txt"  -ignore_first 35 -logfile tmp.log -run_manip -manipfile SO_SA_2019_manipulation_simUntil35.txt -finalmanip SO_SA_2019_best_manip_simUntil35_apply0.5pc.txt -ac_format "2019/ACFORMAT/federal_2019_SA.stv" 6 -tprefix sa -applyhalf 0.05
+./stv -ballots "2019/federal_2019_SA.txt"  -ignore_first 35 -logfile tmp.log -run_manip -manipfile SO_SA_2019_manipulation_simUntil35.txt -finalmanip SO_SA_2019_best_manip_simUntil35_apply0.5pc.txt -ac_format "2019/ACFORMAT/federal_2019_SA.stv" 6 -tprefix sa -applyhalf 0.005
 
 rm SO_SA_2019_manipulation_simUntil35.txt_*.log
 
