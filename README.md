@@ -21,7 +21,7 @@ https://github.com/SiliconEconometrics/PublicService.
 
 Follow the instructions provided to compile and run the simulator.
 
-To use our heuristics, download the STV-Manipulator repository and place the PublicService folder (downloaded via Andrew's repository, above) in the STV-Manipulator directory. Compile with the provided Makefile (you may need to modify this with alternate directories for dependences such as CPLEX, and if you are not using Linux).
+To use our heuristics, download the STV-Manipulator repository and place the PublicService folder (downloaded via Andrew's repository, above) in the STV-Manipulator directory. Compile with the provided Makefile (you may need to modify this with alternate directories for dependences such as CPLEX, and if you are not using Linux). You will need to also run the Makefile in the SimPartial subfolder.
 
 The repository includes two sets of data files for the 2016 and 2019 Australian Federal Senate elections -- one in a standardised format developed by Andrew Conway; and one in a simpler format used by STV-Manipulator. We plan to migrate STV-Manipulator to use the one standardised format at some point in the future. These data files are located in the sub-directories: 2016, 2016/ACFORMAT, 2019, and 2019/ACFORMAT.
 
