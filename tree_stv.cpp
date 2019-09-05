@@ -66,21 +66,6 @@ void PrintFringe(const Fringe &fringe, ostream &log){
     log << "--------------------------------" << endl;
 }
 
-bool IgnoreOrder(const set<int> &elected, const Config &config){
-    if(!config.elect_only.empty()){
-        Ints temp(config.ncandidates);
-        set<int>::iterator it = set_intersection(newn.elected.begin(),
-            newn.elected.end(), config.elect_only.begin(), 
-            config.elect_only.end(), temp.begin());
-
-        temp.resize(it-temp.begin());
-        if(temp.empty())
-            return true;
-    }
-    return false;
-}
- 
-
 void GetChildren(const Node &n, Nodes &children, const set<int> &elected_o,
     const Config &config)
 {
@@ -100,8 +85,7 @@ void GetChildren(const Node &n, Nodes &children, const set<int> &elected_o,
         newn.dist = n.dist; 
         newn.dist1 = n.dist1; 
 
-        if(!IgnoreOrder(newn.elected,config) && 
-            newn.elected != elected_o){
+        if(newn.elected != elected_o){
             children.push_back(newn);
         }
 
@@ -134,8 +118,7 @@ void GetChildren(const Node &n, Nodes &children, const set<int> &elected_o,
                 newn.elected.insert(sc);
             }
 
-            if(!IgnoreOrder(newn.elected,config) && 
-                newn.elected != elected_o){
+            if(newn.elected != elected_o){
                 children.push_back(newn);           
             }
         }
@@ -162,8 +145,7 @@ void GetChildren(const Node &n, Nodes &children, const set<int> &elected_o,
                 newn.elected.insert(fc);
             }
 
-            if(!IgnoreOrder(newn.elected,config) && 
-                newn.elected != elected_o){
+            if(newn.elected != elected_o){
                 children.push_back(newn);           
             }
         }
@@ -186,13 +168,11 @@ void GetChildren(const Node &n, Nodes &children, const set<int> &elected_o,
         newn.order_c.push_back(sc);
         newn.order_a.push_back(0); 
 
-        if(!IgnoreOrder(newn.elected,config)){ 
-            children.push_back(newn);       
+        children.push_back(newn);       
 
-            newn.order_c[newn.order_c.size()-2] = sc;   
-            newn.order_c[newn.order_c.size()-1] = fc;   
-            children.push_back(newn); 
-        }      
+        newn.order_c[newn.order_c.size()-2] = sc;   
+        newn.order_c[newn.order_c.size()-1] = fc;   
+        children.push_back(newn);      
     }
     else{
         for(int j = 0; j < n.remcand.size(); ++j){
@@ -230,8 +210,7 @@ void GetChildren(const Node &n, Nodes &children, const set<int> &elected_o,
                     }
                 }
 
-                if(!(newn.seatsleft == 0 && (newn.elected == elected_o ||
-                    IgnoreOrder(newn.elected,config))){
+                if(!(newn.seatsleft == 0 && newn.elected == elected_o)){
                     children.push_back(newn);
                 }
             }
