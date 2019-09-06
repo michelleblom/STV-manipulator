@@ -66,8 +66,7 @@ void PrintFringe(const Fringe &fringe, ostream &log){
     log << "--------------------------------" << endl;
 }
 
-void GetChildren(const Node &n, Nodes &children, const set<int> &elected_o,
-    const Config &config)
+void GetChildren(const Node &n, Nodes &children, const set<int> &elected_o)
 {
     if(n.seatsleft == n.remcand.size()){
         Node newn(n.cand_proc.size(), n.bid2newid.size());
