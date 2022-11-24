@@ -466,59 +466,81 @@ double WEUB(const Ballots &ballots, const Doubles &votecounts,
                     votecounts, config, false, cout);
             }
             else{
-                // start with candidate with largest surplus
-                Candidate &elect = cand[surpluses.front().id];
-                double surplus = surpluses.front().weight;
-                double e_tally = elect.sim_votes;
+                L_IDS new_surpluses;
+    
+                while(!surpluses.empty()){
+                    
+                    // start with candidate with largest surplus
+                    Candidate &elect = cand[surpluses.front().id];
+                    double surplus = surpluses.front().weight;
+                    double e_tally = elect.sim_votes;
 
-                double leastvotes = numeric_limits<double>::max();
-                double maxvotes = -1;
-                for(int i = 0; i < cand.size(); ++i){
-                    const Candidate &c = cand[i];
-                    if(!c.standing)
-                        continue;
-                    if(c.sim_votes < leastvotes){
-                        leastvotes = c.sim_votes;
-                    }
-                    if(c.sim_votes > maxvotes){
-                        maxvotes = c.sim_votes;
-                    }
-                }
- 
-                if(config.FIX_UNTIL < counter){
-                    // How many votes do we need to take away from the elected
-                    // candidate and give to one that is still remaining (a
-                    // candidate that is an original "loser") to put them
-                    // above a quota.
-                    // Create sorted version of ballots in terms of where elected
-                    // candidate is positioned.
+                    // is following used for anything anymore?
+                    double leastvotes = numeric_limits<double>::max();
+                    double maxvotes = -1;
                     for(int i = 0; i < cand.size(); ++i){
-                        if(i == elect.index)
+                        const Candidate &c = cand[i];
+                        if(!c.standing)
                             continue;
-                        double tally = cand[i].sim_votes;
-
-                        if(elected.find(i) == elected.end() &&
-                            cand[i].standing){
-                            // Try give candidate 'i' a quota at this point
-                            int shift = ceil(max(0.0, max(quota - tally, e_tally-tally+1)));
-                            //cout << "shift " << shift << endl;
-                            ChangeTest t;
-                            t.c1 = elect.index;
-                            t.c2 = i;
-                            t.amount = shift;
-                            totest.push_back(t);
+                        if(c.sim_votes < leastvotes){
+                            leastvotes = c.sim_votes;
+                        }
+                        if(c.sim_votes > maxvotes){
+                            maxvotes = c.sim_votes;
                         }
                     }
+ 
+                    if(config.FIX_UNTIL < counter){
+                        // How many votes do we need to take away from the elected
+                        // candidate and give to one that is still remaining (a
+                        // candidate that is an original "loser") to put them
+                        // above a quota.
+                        // Create sorted version of ballots in terms of where elected
+                        // candidate is positioned.
+                        for(int i = 0; i < cand.size(); ++i){
+                            if(i == elect.index)
+                                continue;
+                            double tally = cand[i].sim_votes;
+
+                            if(elected.find(i) == elected.end() &&
+                                cand[i].standing){
+                                // Try give candidate 'i' a quota at this point
+                                int shift = ceil(max(0.0, max(quota - tally, e_tally-tally+1)));
+                                //cout << "shift " << shift << endl;
+                                ChangeTest t;
+                                t.c1 = elect.index;
+                                t.c2 = i;
+                                t.amount = shift;
+                                totest.push_back(t);
+                            }
+                        }
+                    }
+
+                    elect.seat = currseat++;
+                    elect.standing = 0;
+
+                    // distribute surplus
+                    DistributeSurplus(elect,cand,surplus,ballots,
+                        votecounts, config, false, cout);
+
+                    surpluses.pop_front();
+                    
+                    for(int i = 0; i < cand.size(); ++i){
+				        Candidate &c = cand[i];
+
+				        if(!c.standing || c.surplus) 
+                            continue;
+
+				        if(c.sim_votes >= quota){
+					        InsertCandidateSurplus(c, max(0.0,
+                                c.sim_votes-quota), new_surpluses);
+					        c.surplus = 1;
+				        }
+			        }
                 }
-
-                elect.seat = currseat++;
-                elect.standing = 0;
-
-                // distribute surplus
-                DistributeSurplus(elect,cand,surplus,ballots,
-                    votecounts, config, false, cout);
-
-                surpluses.pop_front();
+                
+                surpluses.insert(surpluses.end(), new_surpluses.begin(),
+                    new_surpluses.end());
             }
 
             if(currseat == config.nseats){
@@ -689,26 +711,46 @@ bool SimSTV(const Ballots &ballots, const Doubles &votecounts,
                     }
                 }
 
-                // start with candidate with largest surplus
-                Candidate &elect = cand[surpluses.front().id];
-                double surplus = surpluses.front().weight;
+                L_IDS new_surpluses;
+    
+                while(!surpluses.empty()){
+                    // start with candidate with largest surplus
+                    Candidate &elect = cand[surpluses.front().id];
+                    double surplus = surpluses.front().weight;
 
-                elect.seat = currseat++;
-                elect.standing = 0;
+                    elect.seat = currseat++;
+                    elect.standing = 0;
 
-                order_c.push_back(elect.index);
-                order_a.push_back(1);
+                    order_c.push_back(elect.index);
+                    order_a.push_back(1);
 
-                if(log) logs<<"Candidate "<<elect.id<<" elected (votes "
-                    << elect.sim_votes << ") " << endl;
+                    if(log) logs<<"Candidate "<<elect.id<<" elected (votes "
+                        << elect.sim_votes << ") " << endl;
 
-                // distribute surplus
-                if(currseat < config.nseats){
-                    DistributeSurplus(elect,cand,surplus,ballots,
-                        votecounts, config,log, logs);
+                    // distribute surplus
+                    if(currseat < config.nseats){
+                        DistributeSurplus(elect,cand,surplus,ballots,
+                            votecounts, config,log, logs);
+                    }
+
+                    surpluses.pop_front();
+                    
+                    for(int i = 0; i < cand.size(); ++i){
+				        Candidate &c = cand[i];
+
+				        if(!c.standing || c.surplus) 
+                            continue;
+
+				        if(c.sim_votes >= quota){
+					        InsertCandidateSurplus(c, max(0.0,
+                                c.sim_votes-quota), new_surpluses);
+					        c.surplus = 1;
+				        }
+			        }
                 }
-
-                surpluses.pop_front();
+                
+                surpluses.insert(surpluses.end(), new_surpluses.begin(),
+                    new_surpluses.end());
             }
 
             if(currseat == config.nseats){
